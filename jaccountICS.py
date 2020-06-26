@@ -225,7 +225,7 @@ class Calendar: # 日历类
         self.__events__.pop(event_id)
 
     def get_ics_text(self):
-        self.__calendar_text__ = """BEGIN:VCALENDAR\nPRODID:-//Apple Inc.//Mac OS X 10.14.6//EN\nVERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nX-WR-CALNAME:%s\nX-WR-TIMEZONE:null\n""" % self.calendar_name
+        self.__calendar_text__ = """BEGIN:VCALENDAR\nPRODID:-//Apple Inc.//Mac OS X 10.14.6//EN\nX-APPLE-CALENDAR-COLOR:#FD97E4\nVERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nX-WR-CALNAME:%s\nX-WR-TIMEZONE:Asia/Shanghai\nCALSCALE:GREGORIAN\n""" % self.calendar_name
         for key, value in self.__events__.items():
             self.__calendar_text__ += value.__turn_to_string__()
         self.__calendar_text__ += "END:VCALENDAR"
