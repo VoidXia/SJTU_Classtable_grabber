@@ -98,7 +98,7 @@ def getClasses():# 抓取课程信息
             warnings[0]=warnings[0].text
             print (warnings[0])
             if(warnings[0]=="wrong username or password" or "用户名和密码" in str(warnings[0])):
-                print("\nWrong username or password! Please check again!")
+                print("\nWrong username or password! Please check!")
                 sys.exit()
 
     chrome_driver.get(
@@ -235,7 +235,7 @@ class Calendar: # 日历类
         ics_text = self.get_ics_text()
         open("%s.ics" % self.calendar_name, "w", encoding="utf8").write(
             ics_text)  # 使用utf8编码生成ics文件
-        print ("\n\nCalendar file successfully exported at :",os.getcwd()+"/"+"%s.ics !" % self.calendar_name)
+        print ("\n\nCalendar file successfully exported at:",os.getcwd()+"/"+"%s.ics !\n" % self.calendar_name)
 
     def open_ics_file(self):
         os.system("%s.ics" % self.calendar_name)
@@ -387,7 +387,7 @@ if __name__ == '__main__': # 主程序
             print("Sleeping for 2 secs.")
             time.sleep(2)
 
-        calendar = Calendar(calendar_name="jAccount 1B{auto}")
+        calendar = Calendar(calendar_name="2020-Spring{auto}")
         option = webdriver.ChromeOptions()
         option.add_argument('disable-infobars')
         if (platform.system() == "Darwin"):
@@ -402,16 +402,16 @@ if __name__ == '__main__': # 主程序
         printALLICS() # 打印ICS文件
         drawWk() # 绘制课表
 
-        #print(chrome_driver.find_elements(By.CLASS_NAME,"timetable_con text-left"))
+        # print(chrome_driver.find_elements(By.CLASS_NAME,"timetable_con text-left"))
         # chrome_driver.close()
         # print(chrome_driver.page_source)
-        # print (os.getcwd()+"/jAccount 1B{auto}.ics")
+        # print (os.getcwd()+"/2020-Spring{auto}.ics")
         print('\nSucceeded!')
 
         if (platform.system() == "Darwin"):
             print("\nOpening the calendar for you........")
             time.sleep(1)
-            subprocess.call(["open", "jAccount 1B{auto}.ics"])  # 自动打开！
+            subprocess.call(["open", "2020-Spring{auto}.ics"])  # 自动打开！
 
     except:
         chrome_driver.close()
