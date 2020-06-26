@@ -13,6 +13,7 @@ import uuid
 import tkinter.font as tkFont
 import platform
 import subprocess
+import getpass
 
 from PIL import Image, ImageEnhance  # 引用库的顺序
 
@@ -36,8 +37,9 @@ pwd = '********'
 
 print("\nWelcome to use the automated jAccount Classtable grabber!\n")
 print("Running on", platform.system(), 'operating system.\n')
-print("This program only grabs SJTU 2019-2020-Spring Online Courses, converts them into zoom urls")
-print("and makes an \".ics\" file for calendars while users checking the classtable within program.\n")
+print("This program only grabs SJTU 2019-2020-Spring Online Courses, converts them into zoom urls",end=' ')
+print("and makes an \".ics\" file for calendars while users checking the classtable within program.")
+print("Could be quite useful in online learning :P\n")
 print("You can also intergrate your own jAccount password into this program.\n")
 print("If you need to use it in other semesters, please revise it yourself.  \n")
 print("You may download the driver from https://sites.google.com/a/chromium.org/chromedriver/home if a problem occured.\n")
@@ -45,7 +47,7 @@ print("Please confirm the starting date of the semester:",STARTINGDATE)
 print("\nEnjoy  :)\n")
 
 
-def getCaptcha(captcha_url, cookies, params):
+def getCaptcha(captcha_url, cookies, params):# 获取验证码
 
     response = requests.get(captcha_url, cookies=cookies, params=params)
     with open('img.jpeg', 'wb+') as f:
@@ -62,7 +64,7 @@ def getCaptcha(captcha_url, cookies, params):
     return code
 
 
-def getClasses():
+def getClasses():# 抓取课程信息
 
     chrome_driver.get(url)
 
@@ -79,6 +81,7 @@ def getClasses():
         while(code == ""):
             code = getCaptcha(captcha_url, cookies, params)
             print("\ncode =", code)
+            print()
             time.sleep(0.03)
 
         input_user = chrome_driver.find_element_by_id('user')
@@ -90,6 +93,13 @@ def getClasses():
         input_code.send_keys(Keys.ENTER)
         # print(chrome_driver.current_url)
         time.sleep(0.03)
+        warnings=chrome_driver.find_elements_by_id('div_warn')
+        if(len(warnings)>0):
+            warnings[0]=warnings[0].text
+            print (warnings[0])
+            if(warnings[0]=="wrong username or password" or "用户名和密码" in str(warnings[0])):
+                print("\nWrong username or password! Please check again!")
+                sys.exit()
 
     chrome_driver.get(
         "http://kbcx.sjtu.edu.cn/kbcx/xskbcx_cxXskbcxIndex.html?gnmkdm=N2151&layout=default")
@@ -101,7 +111,7 @@ def getClasses():
     #zooms = chrome_driver.find_elements_by_css_selector('span.title')
 
 
-def drawClass(c, wk, wkday, st, ed, txt, url):
+def drawClass(c, wk, wkday, st, ed, txt, url): # 对每一个课程对象进行绘制
 
     print("Drawing", txt, " on", c, "at Day", wkday, "From", st, "to", ed)
     wkday = int(wkday)
@@ -113,11 +123,10 @@ def drawClass(c, wk, wkday, st, ed, txt, url):
     y0 = 50
     c.create_rectangle(x0+20+(wkday-1)*zuo, y0+20+(st-1)*you,
                        x0+100+(wkday-1)*zuo, y0+53+(ed-1)*you, tags="#1")
-    c.create_text(2+x0+20+(wkday-1)*zuo, 10+y0+20+(st-1)*you, text=txt.replace("(",
-                                                                               "").replace(")", "").replace("（", "").replace("）", ""), anchor=NW)  # 中文括号，特别小心
+    c.create_text(2+x0+20+(wkday-1)*zuo, 10+y0+20+(st-1)*you, text=re.sub("[\(,\),（,）]","",txt), anchor=NW)  # 正则表达式 中文括号，特别小心
 
 
-class Event:
+class Event:    # 日历事件类
 
     def __init__(self, kwargs):
 
@@ -136,7 +145,7 @@ class Event:
         return self.event_text
 
 
-def drawWk():
+def drawWk(): # 绘制整版课表大框架搭建
 
     top = Tk()
     top.geometry('630x700')
@@ -149,10 +158,10 @@ def drawWk():
         lis.append(i)
     lis[0]="Please select WEEK:"
 
-    x = StringVar()     # #创建变量，便于取值
-    com = ttk.Combobox(top, textvariable=x)     # #创建下拉菜单
-    com.place(x=10, y=15)     # #将下拉菜单绑定到窗体
-    com["value"] = lis    # #给下拉菜单设定值
+    x = StringVar()     # 创建变量，便于取值
+    com = ttk.Combobox(top, textvariable=x)     # 创建下拉菜单
+    com.place(x=10, y=15)     # 将下拉菜单绑定到窗体
+    com["value"] = lis    # 给下拉菜单设定值
     com.current(0)
 
     def xFunc(event):
@@ -171,7 +180,8 @@ def drawWk():
     top.mainloop()
 
 
-def drawWeek(c, week, fun):
+def drawWeek(c, week, fun): # 绘制整版课表 对每堂课判定是否绘制
+                            # 生成ics文件 对每堂课判定是否绘制
 
     print("WEEK: ",week)
     for i in range(len(titles)):
@@ -193,7 +203,7 @@ def drawWeek(c, week, fun):
                     clock[i][1], titles[i], urls[i])
 
 
-class Calendar:
+class Calendar: # 日历类
 
     def __init__(self, calendar_name="My Calendar"):
         self.__events__ = {}
@@ -231,7 +241,7 @@ class Calendar:
         os.system("%s.ics" % self.calendar_name)
 
 
-def add_event(cal, SUMMARY, DTSTART, DTEND, DESCRIPTION, LOCATION):
+def add_event(cal, SUMMARY, DTSTART, DTEND, DESCRIPTION, LOCATION): # 增加事件函数
     """
     :param cal: calender
     :param SUMMARY:
@@ -263,7 +273,7 @@ def add_event(cal, SUMMARY, DTSTART, DTEND, DESCRIPTION, LOCATION):
     )
 
 
-def wktoday(wk, wkday):
+def wktoday(wk, wkday): # 输入周数和第几天，输出日期。
 
     year = int(STARTINGDATE[0])
     month = int(STARTINGDATE[1])
@@ -280,11 +290,11 @@ def wktoday(wk, wkday):
     return year, month, day
 
 
-def getprecTime(at):
+def getprecTime(at): # 对每堂课的时间节点获取精确的时和分
     return timeh[at], timem[at]
 
 
-def gnrtICS(c, wk, wkday, st, ed, txt, url):
+def gnrtICS(c, wk, wkday, st, ed, txt, url): # 对一节课增加对应的一项事件
 
     print("PRINTING ICS:", txt, "  at Week", wk,
           "Day", wkday, ", from Class", st, "to", ed)
@@ -302,7 +312,7 @@ def gnrtICS(c, wk, wkday, st, ed, txt, url):
               )
 
 
-def printALLICS():
+def printALLICS(): # 生成ICS文件大框架函数
 
     lis = []
     c = 0
@@ -313,7 +323,7 @@ def printALLICS():
     calendar.save_as_ics_file()
 
 
-def extractClasses():
+def extractClasses(): # 对获取到的所有课程 过滤筛选 得到数个列表
 
     classes = getClasses()
     for i in range(len(classes)):
@@ -365,18 +375,19 @@ def extractClasses():
                 print("")
 
 
-if __name__ == '__main__':
+if __name__ == '__main__': # 主程序
 
     try:
 
-        if(pwd == '********'):
-            username = input("Please enter your USERNAME:")
-            pwd = input("Please enter your PASSWORD:")
+        if(pwd == '********'): # 更新用户名密码
+            username = input("Please enter your USERNAME: ")
+            pwd = getpass.getpass('Please enter your PASSWORD: ') # 密码不可见
+            # pwd = input("Please enter your PASSWORD:")
         else:
             print("Sleeping for 2 secs.")
             time.sleep(2)
 
-        calendar = Calendar(calendar_name="jAccount 1B{test}")
+        calendar = Calendar(calendar_name="jAccount 1B{auto}")
         option = webdriver.ChromeOptions()
         option.add_argument('disable-infobars')
         if (platform.system() == "Darwin"):
@@ -386,22 +397,22 @@ if __name__ == '__main__':
         if (platform.system() == "Linux"):
             chrome_driver = webdriver.Chrome("./chromedriver_linux")  # 判断操作系统 根据操作系统自动选择驱动程序
 
-        extractClasses()
-        chrome_driver.close()
-        printALLICS()
-        drawWk()
+        extractClasses() # 提取课程
+        chrome_driver.close() # 关闭浏览器窗口
+        printALLICS() # 打印ICS文件
+        drawWk() # 绘制课表
 
         #print(chrome_driver.find_elements(By.CLASS_NAME,"timetable_con text-left"))
         # chrome_driver.close()
         # print(chrome_driver.page_source)
-        # print (os.getcwd()+"/jAccount 1B{test}.ics")
+        # print (os.getcwd()+"/jAccount 1B{auto}.ics")
         print('\nSucceeded!')
 
         if (platform.system() == "Darwin"):
             print("\nOpening the calendar for you........")
             time.sleep(1)
-            subprocess.call(["open", "jAccount 1B{test}.ics"])  # 自动打开！
+            subprocess.call(["open", "jAccount 1B{auto}.ics"])  # 自动打开！
 
     except:
         chrome_driver.close()
-        print("\n\nUnexpectedly halted! Please try again.")
+        print("\n\nUnexpectedly halted! Please try again.") # 故障处理
