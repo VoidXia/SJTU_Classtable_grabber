@@ -394,6 +394,7 @@ if __name__ == '__main__': # 主程序
             chrome_driver = webdriver.Chrome("./chromedriver")
         if (platform.system() == "Windows"):
             chrome_driver = webdriver.Chrome("./chromedriver.exe")
+            pytesseract.pytesseract.tesseract_cmd = 'C:\Program Files\Tesseract-OCR\\tesseract.exe'
         if (platform.system() == "Linux"):
             chrome_driver = webdriver.Chrome("./chromedriver_linux")  # 判断操作系统 根据操作系统自动选择驱动程序
 
@@ -414,5 +415,8 @@ if __name__ == '__main__': # 主程序
             subprocess.call(["open", "2020-Spring{auto}.ics"])  # 自动打开！
 
     except:
-        chrome_driver.close()
+        try:
+            chrome_driver.close()
+        except:
+            time.sleep(0.1)
         print("\n\nUnexpectedly halted! Please try again.") # 故障处理
