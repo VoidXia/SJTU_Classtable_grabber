@@ -42,7 +42,7 @@ print("and makes an \".ics\" file for calendars while users checking the classta
 print("Could be quite useful in online learning :P\n")
 print("You can also intergrate your own jAccount password into this program.\n")
 print("If you need to use it in other semesters, please revise it yourself.  \n")
-print("You may download the driver from https://sites.google.com/a/chromium.org/chromedriver/home if a problem occured.\n")
+print("Although we have already downloaded it for you, you may download the driver from https://sites.google.com/a/chromium.org/chromedriver/home if a problem occured.\n")
 print("Please confirm the starting date of the semester:",STARTINGDATE)
 print("\nEnjoy  :)\n")
 
@@ -126,25 +126,6 @@ def drawClass(c, wk, wkday, st, ed, txt, url): # 对每一个课程对象进行�
     c.create_text(2+x0+20+(wkday-1)*zuo, 10+y0+20+(st-1)*you, text=re.sub("[\(,\),（,）]","",txt), anchor=NW)  # 正则表达式 中文括号，特别小心
 
 
-class Event:    # 日历事件类
-
-    def __init__(self, kwargs):
-
-        self.event_data = kwargs
-
-    def __turn_to_string__(self):
-
-        self.event_text = "BEGIN:VEVENT\n"
-        for item, data in self.event_data.items():
-            item = str(item).replace("_", "-")
-            if item not in ["ORGANIZER", "DTSTART", "DTEND"]:
-                self.event_text += "%s:%s\n" % (item, data)
-            else:
-                self.event_text += "%s;%s\n" % (item, data)
-        self.event_text += "END:VEVENT\n"
-        return self.event_text
-
-
 def drawWk(): # 绘制整版课表大框架搭建
 
     top = Tk()
@@ -180,8 +161,8 @@ def drawWk(): # 绘制整版课表大框架搭建
     top.mainloop()
 
 
-def drawWeek(c, week, fun): # 绘制整版课表 对每堂课判定是否绘制
-                            # 生成ics文件 对每堂课判定是否绘制
+def drawWeek(c, week, fun): # 绘制一个星期的整版课表 对每堂课判定是否绘制
+                            # 写入一个星期的ics文件 对每堂课判定是否绘制
 
     print("WEEK: ",week)
     for i in range(len(titles)):
@@ -201,6 +182,25 @@ def drawWeek(c, week, fun): # 绘制整版课表 对每堂课判定是否绘制
                 # print(i)
                 fun(c, week, weeks[i][0], clock[i][0],
                     clock[i][1], titles[i], urls[i])
+
+
+class Event:    # 日历事件类
+
+    def __init__(self, kwargs):
+
+        self.event_data = kwargs
+
+    def __turn_to_string__(self):
+
+        self.event_text = "BEGIN:VEVENT\n"
+        for item, data in self.event_data.items():
+            item = str(item).replace("_", "-")
+            if item not in ["ORGANIZER", "DTSTART", "DTEND"]:
+                self.event_text += "%s:%s\n" % (item, data)
+            else:
+                self.event_text += "%s;%s\n" % (item, data)
+        self.event_text += "END:VEVENT\n"
+        return self.event_text
 
 
 class Calendar: # 日历类
@@ -262,7 +262,8 @@ def add_event(cal, SUMMARY, DTSTART, DTEND, DESCRIPTION, LOCATION): # 增加事�
         DTEND=dt_end,
         DTSTAMP=create_time,
         UID=str(uuid.uuid5(uuid.NAMESPACE_DNS, dt_start+SUMMARY +
-                           create_time))+"-uuid@sjtu.edu.cn",  # 生成唯一UUID
+                           create_time))+"-uuid@sjtu.edu.cn",  
+                           # 根据程序运行时间，事件名称和事件开始时间，生成唯一UUID
         SEQUENCE="0",
         CREATED=create_time,
         DESCRIPTION=DESCRIPTION,
@@ -407,7 +408,7 @@ if __name__ == '__main__': # 主程序
         # chrome_driver.close()
         # print(chrome_driver.page_source)
         # print (os.getcwd()+"/2020-Spring{auto}.ics")
-        print('\nSucceeded!')
+        print('\nSuccess!')
 
         if (platform.system() == "Darwin"):
             print("\nOpening the calendar for you........")
