@@ -1,5 +1,7 @@
 # SJTU_Classtable_grabber
 
+如需访问排版更好的描述文档，请跳转到[DESCRIPTION.md](DESCRIPTION.md)
+
 <br>
 本程序运行于Python3下。
 
@@ -124,6 +126,8 @@ Zoom手机客户端拥有从日历同步事件的功能，可是网上和app本�
     tmp2 = re.findall(r"\d+\.?\d*", tmp0[6])
 
 分情况讨论。
+
+<br>
 
 创建列表：
 
