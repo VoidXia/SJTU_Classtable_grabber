@@ -36,6 +36,7 @@ pwd = '********'
 
 
 print("\nWelcome to use the automated jAccount Classtable grabber!\n")
+print("Hosting on https://github.com/VoidXia/SJTU_Classtable_grabber\n")
 print("Running on", platform.system(), 'operating system.\n')
 print("This program only grabs SJTU 2019-2020-Spring Online Courses, converts them into zoom urls",end=' ')
 print("and makes an \".ics\" file for calendars while users checking the classtable within program.")
@@ -111,6 +112,58 @@ def getClasses():# 抓取课程信息
     #zooms = chrome_driver.find_elements_by_css_selector('span.title')
 
 
+def extractClasses(): # 对获取到的所有课程 过滤筛选 得到数个列表
+
+    classes = getClasses()
+    for i in range(len(classes)):
+        # print (classes[i].text)
+        if (classes[i].text != ""):
+            tmp1 = classes[i].text 
+            tmp0 = tmp1.split()
+            if (tmp0[6] != '暂不开课'):
+                print(tmp0)
+                # print(classes[i].get_attribute('id'))
+                weeks.append(re.findall(
+                    r"\d+\.?\d*", classes[i].get_attribute('id')))
+                print(weeks[-1])
+                titles.append(tmp0[0])
+                times.append(tmp0[1])
+                tmp2 = re.findall(r"\d+\.?\d*", tmp0[6])  # 正则表达式
+                if(len(tmp2) > 0):
+                    if (len(tmp2) > 1):  # 有两种类型
+                        pwds.append(str(tmp2[1]))
+                        zooms.append(str(tmp2[0]))
+                    else:
+                        # print(tmp2)
+                        zooms.append(tmp2[0])
+                        pwds.append(re.findall(r"\d+\.?\d*", tmp0[7])[0])
+                else:
+                    zooms.append("NOT PROVIDED")
+                    pwds.append("NOT PROVIDED")
+                urls.append("NOT PROVIDED")
+
+                if (zooms[-1] != "NOT PROVIDED"):
+                    urls[-1] = "https://zoom.com.cn/j/" + \
+                        zooms[-1]+"?pwd="+pwds[-1]
+                # print (titles[-1],times[-1],zooms[-1],pwds[-1],urls[-1])
+                print(titles[-1], urls[-1])
+
+            #print (tmp0[5])
+            # print()
+
+                clock.append(re.findall(r"\d+\.?\d*", times[-1]))
+                clock[-1].append(0)
+                if ("单" in times[-1]):
+                    clock[-1][-1] = 1
+                if ("双" in times[-1]):
+                    clock[-1][-1] = 2
+                print(clock[-1])
+
+                # print(len(titles),len(times),len(zooms),len(pwds),len(urls),len(clock))
+
+                print("")
+                
+
 def drawClass(c, wk, wkday, st, ed, txt, url): # 对每一个课程对象进行绘制
 
     print("Drawing", txt, " on", c, "at Day", wkday, "From", st, "to", ed)
@@ -163,6 +216,7 @@ def drawWk(): # 绘制整版课表大框架搭建
 
 def drawWeek(c, week, fun): # 绘制一个星期的整版课表 对每堂课判定是否绘制
                             # 写入一个星期的ics文件 对每堂课判定是否绘制
+                            # 传入判定成功后执行的函数名
 
     print("WEEK: ",week)
     for i in range(len(titles)):
@@ -190,49 +244,49 @@ class Event:    # 日历事件类
 
         self.event_data = kwargs
 
-    def __turn_to_string__(self):
+    def toSTR(self):
 
-        self.event_text = "BEGIN:VEVENT\n"
+        self.eventText = "BEGIN:VEVENT\n"
         for item, data in self.event_data.items():
             item = str(item).replace("_", "-")
             if item not in ["ORGANIZER", "DTSTART", "DTEND"]:
-                self.event_text += "%s:%s\n" % (item, data)
+                self.eventText += "%s:%s\n" % (item, data)
             else:
-                self.event_text += "%s;%s\n" % (item, data)
-        self.event_text += "END:VEVENT\n"
-        return self.event_text
+                self.eventText += "%s;%s\n" % (item, data)
+        self.eventText += "END:VEVENT\n"
+        return self.eventText
 
 
 class Calendar: # 日历类
 
     def __init__(self, calendar_name="My Calendar"):
-        self.__events__ = {}
-        self.__event_id__ = 0
+        self.calevents = {}
+        self.eventid = 0
         self.calendar_name = calendar_name
 
     def add_event(self, **kwargs):
         event = Event(kwargs)
-        event_id = self.__event_id__
-        self.__events__[self.__event_id__] = event
-        self.__event_id__ += 1
+        event_id = self.eventid
+        self.calevents[self.eventid] = event
+        self.eventid += 1
         return event_id
 
     def modify_event(self, event_id, **kwargs):
         for item, data in kwargs.items():
-            self.__events__[event_id].event_data[item] = data
+            self.calevents[event_id].event_data[item] = data
 
     def remove_event(self, event_id):
-        self.__events__.pop(event_id)
+        self.calevents.pop(event_id)
 
-    def get_ics_text(self):
-        self.__calendar_text__ = """BEGIN:VCALENDAR\nPRODID:-//Apple Inc.//Mac OS X 10.14.6//EN\nX-APPLE-CALENDAR-COLOR:#FD97E4\nVERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nX-WR-CALNAME:%s\nX-WR-TIMEZONE:Asia/Shanghai\nCALSCALE:GREGORIAN\n""" % self.calendar_name
-        for key, value in self.__events__.items():
-            self.__calendar_text__ += value.__turn_to_string__()
-        self.__calendar_text__ += "END:VCALENDAR"
-        return self.__calendar_text__
+    def getcaltext(self):
+        self.caltext = """BEGIN:VCALENDAR\nPRODID:-//Apple Inc.//Mac OS X 10.14.6//EN\nX-APPLE-CALENDAR-COLOR:#FD97E4\nVERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nX-WR-CALNAME:%s\nX-WR-TIMEZONE:Asia/Shanghai\nCALSCALE:GREGORIAN\n""" % self.calendar_name
+        for key, value in self.calevents.items():
+            self.caltext += value.toSTR()
+        self.caltext += "END:VCALENDAR"
+        return self.caltext
 
     def save_as_ics_file(self):
-        ics_text = self.get_ics_text()
+        ics_text = self.getcaltext()
         open("%s.ics" % self.calendar_name, "w", encoding="utf8").write(
             ics_text)  # 使用utf8编码生成ics文件
         print ("\n\nCalendar file successfully exported at:",os.getcwd()+"/"+"%s.ics !\n" % self.calendar_name)
@@ -324,57 +378,6 @@ def printALLICS(): # 生成ICS文件大框架函数
     calendar.save_as_ics_file()
 
 
-def extractClasses(): # 对获取到的所有课程 过滤筛选 得到数个列表
-
-    classes = getClasses()
-    for i in range(len(classes)):
-        # print (classes[i].text)
-        if (classes[i].text != ""):
-            tmp1 = classes[i].text 
-            tmp0 = tmp1.split()
-            if (tmp0[6] != '暂不开课'):
-                print(tmp0)
-                # print(classes[i].get_attribute('id'))
-                weeks.append(re.findall(
-                    r"\d+\.?\d*", classes[i].get_attribute('id')))
-                print(weeks[-1])
-                titles.append(tmp0[0])
-                times.append(tmp0[1])
-                tmp2 = re.findall(r"\d+\.?\d*", tmp0[6])  # 正则表达式
-                if(len(tmp2) > 0):
-                    if (len(tmp2) > 1):  # 有两种类型
-                        pwds.append(str(tmp2[1]))
-                        zooms.append(str(tmp2[0]))
-                    else:
-                        # print(tmp2)
-                        zooms.append(tmp2[0])
-                        pwds.append(re.findall(r"\d+\.?\d*", tmp0[7])[0])
-                else:
-                    zooms.append("NOT PROVIDED")
-                    pwds.append("NOT PROVIDED")
-                urls.append("NOT PROVIDED")
-
-                if (zooms[-1] != "NOT PROVIDED"):
-                    urls[-1] = "https://zoom.com.cn/j/" + \
-                        zooms[-1]+"?pwd="+pwds[-1]
-                # print (titles[-1],times[-1],zooms[-1],pwds[-1],urls[-1])
-                print(titles[-1], urls[-1])
-
-            #print (tmp0[5])
-            # print()
-
-                clock.append(re.findall(r"\d+\.?\d*", times[-1]))
-                clock[-1].append(0)
-                if ("单" in times[-1]):
-                    clock[-1][-1] = 1
-                if ("双" in times[-1]):
-                    clock[-1][-1] = 2
-                print(clock[-1])
-
-                # print(len(titles),len(times),len(zooms),len(pwds),len(urls),len(clock))
-
-                print("")
-
 
 if __name__ == '__main__': # 主程序
 
@@ -392,12 +395,12 @@ if __name__ == '__main__': # 主程序
         option = webdriver.ChromeOptions()
         option.add_argument('disable-infobars')
         if (platform.system() == "Darwin"):
-            chrome_driver = webdriver.Chrome("./chromedriver")
+            chrome_driver = webdriver.Chrome("./DRIVERS/chromedriver")
         if (platform.system() == "Windows"):
-            chrome_driver = webdriver.Chrome("./chromedriver.exe")
+            chrome_driver = webdriver.Chrome("./DRIVERS/chromedriver.exe")
             pytesseract.pytesseract.tesseract_cmd = 'C:\Program Files\Tesseract-OCR\\tesseract.exe'
         if (platform.system() == "Linux"):
-            chrome_driver = webdriver.Chrome("./chromedriver_linux")  # 判断操作系统 根据操作系统自动选择驱动程序
+            chrome_driver = webdriver.Chrome("./DRIVERS/chromedriver_linux")  # 判断操作系统 根据操作系统自动选择驱动程序
 
         extractClasses() # 提取课程
         chrome_driver.close() # 关闭浏览器窗口
