@@ -183,7 +183,7 @@ Zoom手机客户端拥有从日历同步事件的功能，可是网上和app本�
 如图：
 ![avatar](IMAGES/ios-.png)
 ![avatar](IMAGES/mac-.png)
-![avatar](IMAGES/pad-.png)
+![avatar](IMAGES/pad-.jpg)
 
 
 <br><br>
