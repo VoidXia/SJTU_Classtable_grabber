@@ -2,11 +2,11 @@
 
 ## Features:
 
-automatically grabs classtable on kbcx.sjtu.edu.cn
+Automatically grabs classtable on kbcx.sjtu.edu.cn
 
-generates .ics file for calendar import
+Generates .ics file for calendar import and **Zoom** one-click joining (with Zoom calendar sync enabled)
 
-displays a window for classtable checking
+Displays a window for classtable checking
 
 
 ## Todos:
