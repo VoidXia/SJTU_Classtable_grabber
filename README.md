@@ -15,10 +15,12 @@ Displays a window for classtable checking
 
 ## Todos:
 
-- [X] Draw the ClassTable using tkinter
+- [X] Draw the ClassTable using *tkinter*.
 
-- [ ] Switch from selenium to requests
+- [ ] Write a setup program using *setuptools* for auto package installation.
 
-- [ ] Optimize jAccount Captcha recognition by using classifiers and neural networks (probably BP?)
+- [ ] Switch from *selenium* to *requests*.
+
+- [ ] Optimize jAccount Captcha recognition by using classifiers and neural networks. (probably BP?)
 
 
