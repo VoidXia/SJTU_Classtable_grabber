@@ -1,7 +1,9 @@
-*.jpg
-*.jpeg
+#*.jpg
+#*.jpeg
 *.ics
 .DS_Store
 *.mp4
 *.mov
-*.png
+#*.png
+img.jpeg
+img2.jpeg
