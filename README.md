@@ -1,5 +1,7 @@
 # SJTU_Classtable_grabber
 
+Assignment for course **(2019-2020-2)-CS902**
+
 ## Features:
 
 Automatically grabs classtable on kbcx.sjtu.edu.cn
@@ -15,6 +17,6 @@ Displays a window for classtable checking
 
 - [ ] Switch from selenium to requests
 
-- [ ] Optimize jAccount Captcha recognition by using classifiers and neural networks
+- [ ] Optimize jAccount Captcha recognition by using classifiers and neural networks (probably BP?)
 
 
