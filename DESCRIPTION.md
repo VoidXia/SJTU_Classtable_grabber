@@ -1,8 +1,11 @@
 # SJTU_Classtable_grabber
 
+<br>
 本程序运行于Python3下。
-测试环境：macOS 10.14.6 (18G5033)，Python 3.7.7 (default, Mar 10 2020, 15:43:03) 
-[Clang 11.0.0 (clang-1100.0.33.17)] on darwin
+
+测试环境：
+
+    macOS 10.14.6 (18G5033)，Python 3.7.7 (default, Mar 10 2020, 15:43:03) [Clang 11.0.0 (clang-1100.0.33.17)] on darwin
 
 <br><br>
 ### 设计起因：
