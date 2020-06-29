@@ -17,7 +17,7 @@ Displays a window for classtable checking
 
 - [X] Draw the ClassTable using *tkinter*.
 
-- [ ] Write a setup program using *setuptools* for auto package installation.
+- [ ] Write a setup program using *setuptools* for auto package installation / confirmation.
 
 - [ ] Switch from *selenium* to *requests*.
 
