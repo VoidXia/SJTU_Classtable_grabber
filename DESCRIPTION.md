@@ -1,6 +1,6 @@
 # SJTU_Classtable_grabber
 
-如需访问排版更好的描述文档，请跳转到[DESCRIPTION.md](DESCRIPTION.md)
+如需访问排版更好的描述文档，请跳转到 [DESCRIPTION.md](DESCRIPTION.md)
 
 <br>
 本程序运行于Python3下。
@@ -18,7 +18,7 @@ Zoom手机客户端拥有从日历同步事件的功能，可是网上和app本�
 
 我分析了链接中的规律，并本着简化每次上课时必要且繁琐的输入会议号和密码的操作，写了这版程序。
 
-该代码近日已经在[Github](https://github.com/VoidXia/SJTU_Classtable_grabber)上开源，遵循MIT协议。日后会持续地做完善和更新。
+该代码近日已经在 [GitHub](https://github.com/VoidXia/SJTU_Classtable_grabber) 上开源，遵循MIT协议。日后会持续地做完善和更新。
 
 
 
