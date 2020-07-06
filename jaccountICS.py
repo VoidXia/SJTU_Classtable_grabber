@@ -24,10 +24,14 @@ pwds = []
 urls = []
 clock = []
 weeks = []
-STARTINGDATE = [2020, 3, 2]
+teachers=[]
+courseNum=[]
+# STARTINGDATE = [2020, 3, 2]
+STARTINGDATE = [2020, 9, 7]
 days = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 timeh = [19, 8, 9, 10, 11, 12, 12, 14, 15, 16, 17, 18, 19]
 timem = [26, 0, 40, 0, 40, 00, 55, 00, 40, 00, 40, 00, 40]
+youbi = ["","一","二","三","四","五","六","日",]
 
 url = "http://kbcx.sjtu.edu.cn/jaccountlogin"
 captcha_url = "https://jaccount.sjtu.edu.cn/jaccount/captcha"
@@ -127,7 +131,11 @@ def extractClasses(): # 对获取到的所有课程 过滤筛选 得到数个列
                     r"\d+\.?\d*", classes[i].get_attribute('id')))
                 print(weeks[-1])
                 titles.append(tmp0[0])
+                titles[-1]=titles[-1].replace("（","(").replace("）",")").replace("◇","").replace("◇","")
                 times.append(tmp0[1])
+                times[-1]=times[-1].replace("（","(").replace("）",")")
+                teachers.append(tmp0[4])
+                courseNum.append(tmp0[5])
                 tmp2 = re.findall(r"\d+\.?\d*", tmp0[6])  # 正则表达式
                 if(len(tmp2) > 0):
                     if (len(tmp2) > 1):  # 有两种类型
@@ -164,8 +172,10 @@ def extractClasses(): # 对获取到的所有课程 过滤筛选 得到数个列
                 print("")
                 
 
-def drawClass(c, wk, wkday, st, ed, txt, url): # 对每一个课程对象进行绘制
+def drawClass(c, wk, i): # 对每一个课程对象进行绘制
 
+
+    wkday, st, ed, txt, url, teacher = weeks[i][0], clock[i][0], clock[i][1], titles[i], urls[i], teachers[i]
     print("Drawing", txt, " on", c, "at Day", wkday, "From", st, "to", ed)
     wkday = int(wkday)
     st = int(st)
@@ -176,7 +186,7 @@ def drawClass(c, wk, wkday, st, ed, txt, url): # 对每一个课程对象进行�
     y0 = 50
     c.create_rectangle(x0+20+(wkday-1)*zuo, y0+20+(st-1)*you,
                        x0+100+(wkday-1)*zuo, y0+53+(ed-1)*you, tags="#1")
-    c.create_text(2+x0+20+(wkday-1)*zuo, 10+y0+20+(st-1)*you, text=re.sub("[\(,\),（,）]","",txt), anchor=NW)  # 正则表达式 中文括号，特别小心
+    c.create_text(2+x0+20+(wkday-1)*zuo, 10+y0+20+(st-1)*you, text=(re.sub("[\(,\),（,）]","",txt))+"\n"+teacher, anchor=NW)  # 正则表达式 中文括号，特别小心
 
 
 def drawWk(): # 绘制整版课表大框架搭建
@@ -226,16 +236,13 @@ def drawWeek(c, week, fun): # 绘制一个星期的整版课表 对每堂课判�
             # if(clock[i][4]==1 and week%2==1):
             if(clock[i][4] == 1 and int(week) % 2 == 1):
                 # print(i)
-                fun(c, week, weeks[i][0], clock[i][0],
-                    clock[i][1], titles[i], urls[i])
+                fun(c, week, i)
             if(clock[i][4] == 2 and int(week) % 2 == 0):
                 # print(i)
-                fun(c, week, weeks[i][0], clock[i][0],
-                    clock[i][1], titles[i], urls[i])
+                fun(c, week, i)
             if(int(clock[i][4]) == 0):
                 # print(i)
-                fun(c, week, weeks[i][0], clock[i][0],
-                    clock[i][1], titles[i], urls[i])
+                fun(c, week, i)
 
 
 class Event:    # 日历事件类
@@ -349,20 +356,21 @@ def getprecTime(at): # 对每堂课的时间节点获取精确的时和分
     return timeh[at], timem[at]
 
 
-def gnrtICS(c, wk, wkday, st, ed, txt, url): # 对一节课增加对应的一项事件
+def gnrtICS(c, wk, i): # 对一节课增加对应的一项事件
 
+    wkday, st, ed, txt, url, teacher, CrsNum = weeks[i][0], clock[i][0], clock[i][1], titles[i], urls[i], teachers[i], courseNum[i]
     print("PRINTING ICS:", txt, "  at Week", wk,
           "Day", wkday, ", from Class", st, "to", ed)
     date = wktoday(wk, wkday)
     pTime0 = getprecTime(int(st))
     pTime1 = getprecTime(int(ed))
     add_event(calendar,
-              SUMMARY=txt,
+              SUMMARY=txt+'，'+teacher,
               DTSTART=datetime.datetime(
                   year=date[0], month=date[1], day=date[2], hour=pTime0[0], minute=pTime0[1], second=00),
               DTEND=datetime.datetime(
                   year=date[0], month=date[1], day=date[2], hour=pTime1[0], minute=pTime1[1], second=00),
-              DESCRIPTION=url,
+              DESCRIPTION=(txt+'，'+teacher+"\\n\\n"+CrsNum+"\\n\\n"+url+"\\n\\n"+"星期"+youbi[int(wkday)]+'，'+times[i]), # needs to be revised (CrsNum .etc)
               LOCATION=url
               )
 
