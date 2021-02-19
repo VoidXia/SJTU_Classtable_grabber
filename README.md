@@ -19,8 +19,8 @@ Displays a window for classtable checking
 
 - [ ] Write a setup program using *setuptools* for auto package installation / confirmation.
 
-- [ ] Switch from *selenium* to *requests*.
+- [X] Switch from *selenium* to *requests*. (Done in other project.)
 
-- [ ] Optimize jAccount Captcha recognition by using classifiers and neural networks. (probably BP?)
+- [X] Optimize jAccount Captcha recognition by using classifiers and neural networks. (Intergrated by pytesseract. Will go over the details while taking the course Machine Learning.)
 
 
